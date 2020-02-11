@@ -2,6 +2,7 @@
  * @module expression
  */
 import { Metadata } from '../../../decorator/metadata/metadata'
+import { attributeNameSanitizer } from './attribute-name-sanitizer.function'
 import { NESTED_ATTR_PATH_CAPTURED_REGEX, NESTED_ATTR_PATH_REGEX } from './attribute-names.const'
 
 // problem: we only get the metadata from the last property -> but we need it for all properties in the chain (prop1.prop2.prop3)
@@ -30,19 +31,21 @@ export function resolveAttributeNames(
 
       const propertyMetadata = metadata && metadata.forProperty(currentPath.join('.'))
 
-      attributeNames[`#${pathPart}`] = propertyMetadata ? propertyMetadata.nameDb : pathPart
+      const sanitizedAttributeName = attributeNameSanitizer(pathPart)
+      attributeNames[`#${sanitizedAttributeName}`] = propertyMetadata ? propertyMetadata.nameDb : pathPart
       if (collectionIndex !== undefined) {
-        namePlaceholders.push(`#${pathPart}[${collectionIndex}]`)
+        namePlaceholders.push(`#${sanitizedAttributeName}[${collectionIndex}]`)
       } else {
-        namePlaceholders.push(`#${pathPart}`)
+        namePlaceholders.push(`#${sanitizedAttributeName}`)
       }
     }
     placeholder = namePlaceholders.join('.')
   } else {
     // top level attribute
     const propertyMetadata = metadata && metadata.forProperty(attributePath)
-    attributeNames[`#${attributePath}`] = propertyMetadata ? propertyMetadata.nameDb : attributePath
-    placeholder = `#${attributePath}`
+    const sanitizedAttributeName = attributeNameSanitizer(attributePath)
+    attributeNames[`#${sanitizedAttributeName}`] = propertyMetadata ? propertyMetadata.nameDb : attributePath
+    placeholder = `#${sanitizedAttributeName}`
   }
 
   return {

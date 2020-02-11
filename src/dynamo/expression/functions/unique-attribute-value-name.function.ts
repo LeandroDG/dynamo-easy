@@ -2,6 +2,7 @@
  * @module expression
  */
 import { attributeNameReplacer } from './attribute-name-replacer.function'
+import { attributeNameSanitizer } from './attribute-name-sanitizer.function'
 
 /**
  * @hidden
@@ -15,7 +16,7 @@ export const BRACED_INDEX_REGEX = /\[(\d+)]/g
  * @hidden
  */
 export function uniqueAttributeValueName(key: string, existingValueNames?: string[]): string {
-  key = key.replace(/\./g, '__').replace(BRACED_INDEX_REGEX, attributeNameReplacer)
+  key = attributeNameSanitizer(key).replace(BRACED_INDEX_REGEX, attributeNameReplacer)
   let potentialName = `:${key}`
   let idx = 1
 
